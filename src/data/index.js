@@ -1,51 +1,62 @@
+import api from "../api/index.js";
 import generateID from "../utils/generateID.js";
 
 const todo = {
   data: [],
-  create: (task) => {
-    const taskList = todo.read();
-    const _id = generateID(40);
-
-    taskList.push({ done: false, ...task, _id });
-
-    todo.data = taskList;
-  },
-  read: () => {
-    return [...todo.data];
-  },
-  update: (id, newData) => {
-    const taskList = todo.read();
-    const newTaskList = taskList.map((task) => {
-      if (task._id !== id) {
-        return task;
-      } else {
-        return { ...task, ...newData };
+  create: async (task) => {
+    const todoList = await api(
+      { url: "/create" },
+      {
+        method: "POST",
+        body: JSON.stringify(task),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
       }
-    });
+    );
 
-    todo.data = newTaskList;
+    return todoList;
   },
-  toggleTask: (id) => {
-    const taskList = todo.read();
-    const newTaskList = taskList.map((task) => {
-      if (task._id !== id) {
-        return task;
-      } else {
-        const done = task.done;
+  read: async () => {
+    const todoList = await api({ url: "/list" });
 
-        return { ...task, done: !done };
+    return todoList;
+  },
+  update: async (id, newData) => {
+    const taskList = await api(
+      { url: `/update/${id}` },
+      {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newData),
       }
-    });
+    );
 
-    todo.data = newTaskList;
+    return taskList;
   },
-  delete: (id) => {
-    const taskList = todo.read();
-    const newTaskList = taskList.filter((task) => {
-      return task._id !== id;
-    });
+  toggleTask: async (id) => {
+    const taskList = await api(
+      { url: `/toggleTask/${id}` },
+      {
+        method: "PUT",
+      }
+    );
 
-    todo.data = newTaskList;
+    return taskList;
+  },
+  delete: async (id) => {
+    const taskList = await api(
+      { url: `/delete/${id}` },
+      {
+        method: "DELETE",
+      }
+    );
+
+    return taskList;
   },
 };
 

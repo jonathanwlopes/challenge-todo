@@ -34,18 +34,15 @@ const Task = {
       children: [_checkbox, _taskName, _editField, _trash],
     });
 
-    _trash.addEventListener("click", () => {
-      todo.delete(props._id);
-
-      const taskList = todo.read();
+    _trash.addEventListener("click", async () => {
+      const taskList = await todo.delete(props._id);
 
       PrintTaskList({ parent: ".task-list", taskList });
     });
 
-    _checkbox.addEventListener("click", () => {
-      todo.toggleTask(props._id);
+    _checkbox.addEventListener("click", async () => {
 
-      const taskList = todo.read();
+     const taskList = await todo.toggleTask(props._id);
 
       PrintTaskList({ parent: ".task-list", taskList });
     });
@@ -56,24 +53,22 @@ const Task = {
       _editField.focus();
     });
 
-    _editField.addEventListener("blur", () => {
+    _editField.addEventListener("blur", async () => {
       _taskName.classList.toggle("hide");
       _editField.classList.toggle("hide");
 
-      todo.update(props._id, { name: _editField.value });
-
-      const taskList = todo.read();
+      const taskList = await todo.update(props._id, { name: _editField.value });
 
       PrintTaskList({ parent: ".task-list", taskList });
     });
 
-    _editField.addEventListener("keyup", (e) => {
+    _editField.addEventListener("keyup", async (e) => {
       const key = e.key;
 
       if (key === "Enter") {
-        todo.update(props._id, { name: _editField.value });
-
-        const taskList = todo.read();
+        const taskList = await todo.update(props._id, {
+          name: _editField.value,
+        });
 
         PrintTaskList({ parent: ".task-list", taskList });
       }
